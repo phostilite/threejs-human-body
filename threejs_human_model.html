@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Human Body - Drag Controls</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: white;
+        }
+        canvas {
+            display: block;
+            cursor: grab;
+        }
+        canvas:active {
+            cursor: grabbing;
+        }
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            display: block;
+            margin: 5px 0;
+            padding: 8px 15px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+        }
+        button:hover {
+            background: #4338CA;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="reset()">Reset View</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // Initialize scene
+        let scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff);
+        
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        let renderer = new THREE.WebGLRenderer({ antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Initialize OrbitControls
+        let controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // Smooth damping
+        controls.dampingFactor = 0.05;
+        controls.screenSpacePanning = false;
+        controls.minDistance = 5;
+        controls.maxDistance = 20;
+        controls.maxPolarAngle = Math.PI; // Allow full vertical rotation
+
+        // Create a group for the entire body
+        let bodyGroup = new THREE.Group();
+        scene.add(bodyGroup);
+
+        // Material for body parts
+        const bodyMaterial = new THREE.MeshPhongMaterial({
+            color: 0xFFD5B5,
+            flatShading: false,
+        });
+
+        // [Previous body parts code remains the same...]
+        // Create torso
+        const torsoGeometry = new THREE.BoxGeometry(2, 3, 1);
+        const torso = new THREE.Mesh(torsoGeometry, bodyMaterial);
+        bodyGroup.add(torso);
+
+        // Create neck
+        const neckGeometry = new THREE.CylinderGeometry(0.3, 0.4, 0.7, 32);
+        const neck = new THREE.Mesh(neckGeometry, bodyMaterial);
+        neck.position.y = 1.8;
+        bodyGroup.add(neck);
+
+        // Create head
+        const headGeometry = new THREE.SphereGeometry(0.7, 32, 32);
+        const head = new THREE.Mesh(headGeometry, bodyMaterial);
+        head.position.y = 2.8;
+        bodyGroup.add(head);
+
+        // Create shoulders and arms
+        function createUpperBody(x) {
+            // Shoulder
+            const shoulderGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+            const shoulder = new THREE.Mesh(shoulderGeometry, bodyMaterial);
+            shoulder.position.set(x, 1, 0);
+            bodyGroup.add(shoulder);
+
+            // Upper arm
+            const upperArmGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1.2, 32);
+            const upperArm = new THREE.Mesh(upperArmGeometry, bodyMaterial);
+            upperArm.position.set(x, 0.4, 0);
+            bodyGroup.add(upperArm);
+
+            // Elbow
+            const elbowGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+            const elbow = new THREE.Mesh(elbowGeometry, bodyMaterial);
+            elbow.position.set(x, -0.2, 0);
+            bodyGroup.add(elbow);
+
+            // Forearm
+            const forearmGeometry = new THREE.CylinderGeometry(0.15, 0.15, 1.2, 32);
+            const forearm = new THREE.Mesh(forearmGeometry, bodyMaterial);
+            forearm.position.set(x, -0.8, 0);
+            bodyGroup.add(forearm);
+
+            // Hand
+            const handGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+            const hand = new THREE.Mesh(handGeometry, bodyMaterial);
+            hand.position.set(x, -1.4, 0);
+            bodyGroup.add(hand);
+        }
+
+        createUpperBody(-1.2); // Left arm
+        createUpperBody(1.2);  // Right arm
+
+        // Create legs
+        function createLeg(x) {
+            // Hip
+            const hipGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+            const hip = new THREE.Mesh(hipGeometry, bodyMaterial);
+            hip.position.set(x, -1.8, 0);
+            bodyGroup.add(hip);
+
+            // Thigh
+            const thighGeometry = new THREE.CylinderGeometry(0.25, 0.2, 1.8, 32);
+            const thigh = new THREE.Mesh(thighGeometry, bodyMaterial);
+            thigh.position.set(x, -2.7, 0);
+            bodyGroup.add(thigh);
+
+            // Knee
+            const kneeGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+            const knee = new THREE.Mesh(kneeGeometry, bodyMaterial);
+            knee.position.set(x, -3.6, 0);
+            bodyGroup.add(knee);
+
+            // Calf
+            const calfGeometry = new THREE.CylinderGeometry(0.2, 0.15, 1.8, 32);
+            const calf = new THREE.Mesh(calfGeometry, bodyMaterial);
+            calf.position.set(x, -4.5, 0);
+            bodyGroup.add(calf);
+
+            // Ankle
+            const ankleGeometry = new THREE.SphereGeometry(0.15, 32, 32);
+            const ankle = new THREE.Mesh(ankleGeometry, bodyMaterial);
+            ankle.position.set(x, -5.4, 0);
+            bodyGroup.add(ankle);
+
+            // Foot
+            const footGeometry = new THREE.BoxGeometry(0.4, 0.3, 0.8);
+            const foot = new THREE.Mesh(footGeometry, bodyMaterial);
+            foot.position.set(x, -5.6, 0.2);
+            bodyGroup.add(foot);
+        }
+
+        createLeg(-0.5);  // Left leg
+        createLeg(0.5);   // Right leg
+
+        // Add lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const frontLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        frontLight.position.set(0, 0, 10);
+        scene.add(frontLight);
+
+        const topLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        topLight.position.set(0, 10, 0);
+        scene.add(topLight);
+
+        // Position camera
+        camera.position.z = 15;
+        camera.position.y = -1;
+
+        // Animation without automatic rotation
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // For smooth damping
+            renderer.render(scene, camera);
+        }
+
+        // Reset function
+        function reset() {
+            controls.reset();
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', onWindowResize, false);
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
